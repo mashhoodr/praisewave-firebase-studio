@@ -11,8 +11,8 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-let firebaseApp: FirebaseApp;
-let auth: Auth;
+let firebaseApp: FirebaseApp | null = null;
+let auth: Auth | null = null;
 
 // Initialize Firebase only on the client-side and when API key is available
 if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
@@ -22,7 +22,7 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
         } catch (error) {
             console.error("Firebase initialization error:", error);
             // Handle the error appropriately, maybe set a fallback or disable Firebase features
-            firebaseApp = null as any; // Ensure firebaseApp is assigned a value even on failure
+            firebaseApp = null; // Ensure firebaseApp is assigned a value even on failure
         }
     } else {
         firebaseApp = getApps()[0];
@@ -33,14 +33,9 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
             auth = getAuth(firebaseApp);
         } catch (error) {
             console.error("Firebase Auth initialization error:", error);
-            auth = null as any; // Ensure auth is assigned a value even on failure
+            auth = null; // Ensure auth is assigned a value even on failure
         }
-    } else {
-        auth = null as any; // If firebaseApp is null, auth should also be null
     }
-} else {
-    firebaseApp = null as any;
-    auth = null as any;
 }
 
 export { firebaseApp, auth };

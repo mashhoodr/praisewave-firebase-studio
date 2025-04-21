@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import {auth} from '@/firebase';
+import { firebaseApp, auth } from '@/firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -39,26 +39,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter(); // Use useRouter
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
-        if (!auth) {
-            console.warn("Firebase Auth not initialized. Authentication features will be unavailable.");
-            setLoading(false);
-            return;
-        }
+        const initialize = async () => {
+            if (!firebaseApp || !auth) {
+                console.warn("Firebase Auth not initialized. Authentication features will be unavailable.");
+                setLoading(false);
+                return;
+            }
 
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
-        return () => unsubscribe();
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                setUser(user);
+                setLoading(false);
+                setInitialized(true);
+            });
+
+            return () => unsubscribe();
+        };
+
+        initialize();
     }, []);
 
-    // Initialize router within useEffect to ensure it's client-side
-    useEffect(() => {
-        // This empty useEffect ensures that this component is treated as a client component.
-        // The useRouter hook can only be called inside a client component.
-    }, []);
 
     const signUp = async (email: string, password: string) => {
         if (!auth) {
@@ -123,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {!loading && initialized && children}
         </AuthContext.Provider>
     );
 };
