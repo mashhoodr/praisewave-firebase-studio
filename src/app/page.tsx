@@ -9,6 +9,8 @@ import {improveAppraisalText} from "@/ai/flows/improve-appraisal-text";
 import {Toaster} from "@/components/ui/toaster";
 import {useToast} from "@/hooks/use-toast";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useAuth} from "@/hooks/useAuth";
+import {useRouter} from "next/navigation";
 
 // Mock user data for demonstration
 const mockUsers = [
@@ -23,6 +25,19 @@ export default function Home() {
   const [improvedAppraisal, setImprovedAppraisal] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>(mockUsers[0].id); // Default to the first user
   const {toast} = useToast();
+  const { user, signOut } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/sign-in');
+        }
+    }, [user, router]);
+
+    if (!user) {
+        return null; // Or a loading indicator
+    }
+
 
   const handleImproveAppraisal = async () => {
     if (!newAppraisal) {
@@ -82,6 +97,9 @@ export default function Home() {
     <div className="flex flex-col items-center justify-start min-h-screen bg-secondary p-4">
       <Toaster/>
       <h1 className="text-3xl font-bold text-primary mb-4">PraiseWave</h1>
+
+        <p>Welcome, {user.email}!</p>
+        <Button onClick={() => signOut()}>Sign Out</Button>
 
       {/* Appraisal Submission Card */}
       <Card className="w-full max-w-2xl mb-6">
