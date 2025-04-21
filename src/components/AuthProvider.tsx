@@ -8,10 +8,12 @@ import {
     signOut as firebaseSignOut,
     onAuthStateChanged,
     sendPasswordResetEmail,
+    User,
 } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextProps {
-    user: any;
+    user: User | null;
     signUp: (email: string, password: string) => Promise<void>;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
@@ -34,8 +36,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter(); // Use useRouter
 
     useEffect(() => {
         if (!auth) {
@@ -49,6 +52,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setLoading(false);
         });
         return () => unsubscribe();
+    }, []);
+
+    // Initialize router within useEffect to ensure it's client-side
+    useEffect(() => {
+        // This empty useEffect ensures that this component is treated as a client component.
+        // The useRouter hook can only be called inside a client component.
     }, []);
 
     const signUp = async (email: string, password: string) => {
