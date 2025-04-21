@@ -1,4 +1,3 @@
-
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -19,7 +18,7 @@ interface AuthContextProps {
     resetPassword: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextProps | null>(null);
+export const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -37,6 +36,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        if (!auth) {
+            console.warn("Firebase Auth not initialized. Authentication features will be unavailable.");
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
         });
@@ -44,6 +48,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     const signUp = async (email: string, password: string) => {
+        if (!auth) {
+            console.error("Firebase Auth is not initialized.");
+            throw new Error("Firebase Auth is not initialized.");
+        }
         try {
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (error: any) {
@@ -53,6 +61,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const signIn = async (email: string, password: string) => {
+        if (!auth) {
+            console.error("Firebase Auth is not initialized.");
+            throw new Error("Firebase Auth is not initialized.");
+        }
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (error: any) {
@@ -62,6 +74,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const signOut = async () => {
+        if (!auth) {
+            console.error("Firebase Auth is not initialized.");
+            throw new Error("Firebase Auth is not initialized.");
+        }
         try {
             await firebaseSignOut(auth);
         } catch (error: any) {
@@ -71,6 +87,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const resetPassword = async (email: string) => {
+        if (!auth) {
+            console.error("Firebase Auth is not initialized.");
+            throw new Error("Firebase Auth is not initialized.");
+        }
         try {
             await sendPasswordResetEmail(auth, email);
         } catch (error: any) {
@@ -93,3 +113,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+

@@ -11,7 +11,6 @@ import {useToast} from "@/hooks/use-toast";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useAuth} from "@/hooks/useAuth";
 import {useRouter} from "next/navigation";
-import {AuthProvider} from "@/components/AuthProvider";
 
 // Mock user data for demonstration
 const mockUsers = [

@@ -14,16 +14,33 @@ const firebaseConfig = {
 let firebaseApp: FirebaseApp;
 let auth: Auth;
 
-// Initialize Firebase only on the client-side
-if (typeof window !== 'undefined') {
+// Initialize Firebase only on the client-side and when API key is available
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
     if (getApps().length === 0) {
-        firebaseApp = initializeApp(firebaseConfig);
+        try {
+            firebaseApp = initializeApp(firebaseConfig);
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            // Handle the error appropriately, maybe set a fallback or disable Firebase features
+            firebaseApp = null as any; // Ensure firebaseApp is assigned a value even on failure
+        }
     } else {
         firebaseApp = getApps()[0];
     }
 
-    auth = getAuth(firebaseApp);
+    if (firebaseApp) {
+        try {
+            auth = getAuth(firebaseApp);
+        } catch (error) {
+            console.error("Firebase Auth initialization error:", error);
+            auth = null as any; // Ensure auth is assigned a value even on failure
+        }
+    } else {
+        auth = null as any; // If firebaseApp is null, auth should also be null
+    }
+} else {
+    firebaseApp = null as any;
+    auth = null as any;
 }
 
 export { firebaseApp, auth };
-
