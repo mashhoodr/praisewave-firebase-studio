@@ -16,6 +16,7 @@ interface AuthContextProps {
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
+    loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextProps | null>(null);
@@ -34,15 +35,18 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!auth) {
             console.warn("Firebase Auth not initialized. Authentication features will be unavailable.");
+            setLoading(false);
             return;
         }
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
+            setLoading(false);
         });
         return () => unsubscribe();
     }, []);
@@ -105,12 +109,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signIn,
         signOut,
         resetPassword,
+        loading,
     };
 
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            {!loading && children}
         </AuthContext.Provider>
     );
 };
-
