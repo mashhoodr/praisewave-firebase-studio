@@ -11,6 +11,7 @@ import {useToast} from "@/hooks/use-toast";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useAuth} from "@/hooks/useAuth";
 import {useRouter} from "next/navigation";
+import {AuthProvider} from "@/components/AuthProvider";
 
 // Mock user data for demonstration
 const mockUsers = [
@@ -94,87 +95,89 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-secondary p-4">
-      <Toaster/>
-      <h1 className="text-3xl font-bold text-primary mb-4">PraiseWave</h1>
+    
+      <div className="flex flex-col items-center justify-start min-h-screen bg-secondary p-4">
+        <Toaster/>
+        <h1 className="text-3xl font-bold text-primary mb-4">PraiseWave</h1>
 
-        <p>Welcome, {user.email}!</p>
-        <Button onClick={() => signOut()}>Sign Out</Button>
+          <p>Welcome, {user.email}!</p>
+          <Button onClick={() => signOut()}>Sign Out</Button>
 
-      {/* Appraisal Submission Card */}
-      <Card className="w-full max-w-2xl mb-6">
-        <CardHeader>
-          <CardTitle>Submit an Appraisal</CardTitle>
-          <CardDescription>Write a positive appraisal for someone.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        {/* Appraisal Submission Card */}
+        <Card className="w-full max-w-2xl mb-6">
+          <CardHeader>
+            <CardTitle>Submit an Appraisal</CardTitle>
+            <CardDescription>Write a positive appraisal for someone.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
 
-          {/* User Selection */}
-          <div className="mb-4">
-            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a user"/>
-              </SelectTrigger>
-              <SelectContent>
-                {mockUsers.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Textarea
-            value={newAppraisal}
-            onChange={(e) => setNewAppraisal(e.target.value)}
-            placeholder="Enter your appraisal here..."
-            className="mb-2"
-          />
-          <div className="flex justify-between">
-            <Button variant="accent" onClick={handleImproveAppraisal}>
-              Improve with AI
-            </Button>
-            <Button onClick={handleSubmitAppraisal}>Submit Appraisal</Button>
-          </div>
-          {improvedAppraisal && (
-            <div className="mt-4 p-3 rounded-md bg-muted">
-              <p className="text-sm italic">
-                Improved Appraisal: {improvedAppraisal}
-              </p>
+            {/* User Selection */}
+            <div className="mb-4">
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a user"/>
+                </SelectTrigger>
+                <SelectContent>
+                  {mockUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Appraisal Display Card */}
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Received Appraisals</CardTitle>
-          <CardDescription>View your recent appraisals.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {appraisals.length > 0 ? (
-            <div className="space-y-4">
-              {appraisals.map((appraisal) => (
-                <div key={appraisal.id} className="flex items-start space-x-4 p-4 rounded-md shadow-sm bg-background">
-                  <Avatar>
-                    <AvatarImage src="https://picsum.photos/50/50" alt="Author Avatar"/>
-                    <AvatarFallback>AA</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{appraisal.author} to {appraisal.targetUser}</p>
-                    <p className="text-xs text-muted-foreground">{appraisal.date}</p>
-                    <p className="text-sm mt-1">{appraisal.text}</p>
+            <Textarea
+              value={newAppraisal}
+              onChange={(e) => setNewAppraisal(e.target.value)}
+              placeholder="Enter your appraisal here..."
+              className="mb-2"
+            />
+            <div className="flex justify-between">
+              <Button variant="accent" onClick={handleImproveAppraisal}>
+                Improve with AI
+              </Button>
+              <Button onClick={handleSubmitAppraisal}>Submit Appraisal</Button>
+            </div>
+            {improvedAppraisal && (
+              <div className="mt-4 p-3 rounded-md bg-muted">
+                <p className="text-sm italic">
+                  Improved Appraisal: {improvedAppraisal}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Appraisal Display Card */}
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle>Received Appraisals</CardTitle>
+            <CardDescription>View your recent appraisals.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {appraisals.length > 0 ? (
+              <div className="space-y-4">
+                {appraisals.map((appraisal) => (
+                  <div key={appraisal.id} className="flex items-start space-x-4 p-4 rounded-md shadow-sm bg-background">
+                    <Avatar>
+                      <AvatarImage src="https://picsum.photos/50/50" alt="Author Avatar"/>
+                      <AvatarFallback>AA</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{appraisal.author} to {appraisal.targetUser}</p>
+                      <p className="text-xs text-muted-foreground">{appraisal.date}</p>
+                      <p className="text-sm mt-1">{appraisal.text}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No appraisals received yet.</p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No appraisals received yet.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    
   );
 }
