@@ -8,11 +8,20 @@ import {useEffect, useState} from "react";
 import {improveAppraisalText} from "@/ai/flows/improve-appraisal-text";
 import {Toaster} from "@/components/ui/toaster";
 import {useToast} from "@/hooks/use-toast";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+
+// Mock user data for demonstration
+const mockUsers = [
+  {id: '1', name: 'Alice Smith'},
+  {id: '2', name: 'Bob Johnson'},
+  {id: '3', name: 'Charlie Brown'},
+];
 
 export default function Home() {
   const [appraisals, setAppraisals] = useState<any[]>([]);
   const [newAppraisal, setNewAppraisal] = useState('');
   const [improvedAppraisal, setImprovedAppraisal] = useState<string>('');
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(mockUsers[0].id); // Default to the first user
   const {toast} = useToast();
 
   const handleImproveAppraisal = async () => {
@@ -52,11 +61,14 @@ export default function Home() {
       return;
     }
 
+    const selectedUser = mockUsers.find(user => user.id === selectedUserId);
+
     setAppraisals([{
       id: Date.now(),
       text: newAppraisal,
       author: 'You',
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString(),
+      targetUser: selectedUser?.name || 'Unknown User',
     }, ...appraisals]);
     setNewAppraisal('');
     setImprovedAppraisal(''); // Clear improved appraisal after submission
@@ -78,6 +90,23 @@ export default function Home() {
           <CardDescription>Write a positive appraisal for someone.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+
+          {/* User Selection */}
+          <div className="mb-4">
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a user"/>
+              </SelectTrigger>
+              <SelectContent>
+                {mockUsers.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <Textarea
             value={newAppraisal}
             onChange={(e) => setNewAppraisal(e.target.value)}
@@ -116,7 +145,7 @@ export default function Home() {
                     <AvatarFallback>AA</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">{appraisal.author}</p>
+                    <p className="text-sm font-medium">{appraisal.author} to {appraisal.targetUser}</p>
                     <p className="text-xs text-muted-foreground">{appraisal.date}</p>
                     <p className="text-sm mt-1">{appraisal.text}</p>
                   </div>
