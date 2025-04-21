@@ -6,12 +6,14 @@ import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {useEffect, useState} from "react";
 import {improveAppraisalText} from "@/ai/flows/improve-appraisal-text";
-import {Toaster, toast} from "@/components/ui/toaster";
+import {Toaster} from "@/components/ui/toaster";
+import {useToast} from "@/hooks/use-toast";
 
 export default function Home() {
   const [appraisals, setAppraisals] = useState<any[]>([]);
   const [newAppraisal, setNewAppraisal] = useState('');
   const [improvedAppraisal, setImprovedAppraisal] = useState<string>('');
+  const {toast} = useToast();
 
   const handleImproveAppraisal = async () => {
     if (!newAppraisal) {
